@@ -33,7 +33,8 @@ def manual_order_input():
 
         selected_product = next((p for p in PRODUCTS if p["id"] == product_id), None)
         if selected_product:
-            description = f"{selected_product['name']} - {selected_product['category']} (Delivery: {delivery_time} hours)"
+            # Updated description format to be more natural and user-friendly
+            description = f"{selected_product['name']} - {selected_product['category']} (Will be delivered in {delivery_time} hours)"
             priority = calculate_priority(urgency, delivery_time, selected_product["category"])
             return Order(order_id=random.randint(1000, 9999), description=description), priority
         else:
@@ -45,17 +46,26 @@ def manual_order_input():
 
 def main():
     print("Starting order processing...")
+    processor = OrderProcessor()
 
     try:
         while True:
             print("\nWould you like to add an order? (Type 'yes' to proceed or 'exit' to stop)")
             user_input = input().strip().lower()
+            
             if user_input == 'exit':
                 print("\nExiting gracefully. Thank you for using the Order Processing System!")
                 break
             elif user_input == 'yes':
-                print("Order input simulated.")
+                order, priority = manual_order_input()
+                if order and priority:
+                    processor.add_order(order, priority)
+                    print(f"Order {order.order_id} added successfully!")
+                    processor.process_order()  # Fixed: Using the correct method name
             else:
                 print("Invalid choice! Please type 'yes' or 'exit'.")
     except KeyboardInterrupt:
         print("\nExiting gracefully. Thank you for using the Order Processing System!")
+
+if __name__ == "__main__":
+    main()

@@ -1,30 +1,35 @@
-import threading
 import time
-from src.priority_queue import PriorityQueue
+from queue import PriorityQueue
 
 class OrderProcessor:
     def __init__(self):
-        self.priority_queue = PriorityQueue()
-        self.lock = threading.Lock()  # Ensures thread-safe access
+        self.order_queue = PriorityQueue()
 
     def add_order(self, order, priority):
-        """Add an order to the priority queue safely."""
-        with self.lock:
-            self.priority_queue.push(order, priority)
-            print(f"Order added: {order}")
+        """Add an order to the processing queue with its priority."""
+        self.order_queue.put((priority, order))
+        print(f"Order added: {order}")
 
     def process_order(self):
-        """Process orders concurrently using threads."""
-        while True:
-            with self.lock:
-                if not self.priority_queue.is_empty():
-                    order = self.priority_queue.pop()
-                    print(f"Processing {order}")
-            time.sleep(2)  # Simulate processing delay
+        """Process the next order in the queue."""
+        if not self.order_queue.empty():
+            priority, order = self.order_queue.get()
+            print(f"Processing {order}")  # The order will now use the updated format
 
-    def start_processing(self):
-        """Start multiple threads to process orders."""
-        for _ in range(3):  # Adjust the number of threads as needed
-            thread = threading.Thread(target=self.process_order)
-            thread.daemon = True  # Threads stop when the main process stops
-            thread.start()
+def process_order(self):
+    """Process orders concurrently using threads."""
+    while True:
+        with self.lock:
+            if not self.priority_queue.is_empty():
+                order = self.priority_queue.pop()
+                # Extract delivery time from the order description
+                delivery_time = self.extract_delivery_time(order.description)
+                print(f"Processing {order} | Delivery: in {delivery_time}")
+        time.sleep(2)  # Simulate processing delay
+
+def extract_delivery_time(self, description):
+    """Extract delivery time from the order description."""
+    # Example: "Laptop - Electronics (Delivery: 3 hours)"
+    start_idx = description.find("Delivery: in") + len("Delivery: in")
+    end_idx = description.find("hours", start_idx)
+    return description[start_idx:end_idx].strip()
